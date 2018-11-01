@@ -27,7 +27,6 @@ before_script:
   - PASSWORD=`echo $ECR_LOGIN | cut -d' ' -f6`
 
 script:
-  - echo Build started on `date`
   - echo Building the Docker image...
   - docker build -t $ECR_REPOSITORY_URI:latest .
 
