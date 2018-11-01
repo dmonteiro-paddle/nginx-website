@@ -32,4 +32,4 @@ after_script:
   - echo Pushing the Docker images...
   - docker push $ECR_REPOSITORY_URI:latest
   - echo Running Clair scan on the Docker Image
-  - ./reg vulns --clair $CLAIR_URL 770328762517.dkr.ecr.us-east-1.amazonaws.com/mysql-backup-s3
+  - ./reg vulns --clair $CLAIR_URL 770328762517.dkr.ecr.us-east-1.amazonaws.com/s3-restore-mysql
