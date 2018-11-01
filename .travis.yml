@@ -20,7 +20,9 @@ before_script:
   - echo Logging in to Amazon ECR...
   - $ECR_LOGIN
   - export REG_SHA256="fd56224f03f3e6bd4a71dcba43ab02114ec8b681a2aa95caa8de26ea1231a606"
-  - curl -fSL "https://github.com/genuinetools/reg/releases/download/v0.15.8/reg-linux-amd64" -o "/usr/local/bin/reg" && echo "${REG_SHA256}  /usr/local/bin/reg" | sha256sum -c - && chmod a+x "/usr/local/bin/reg"
+  - curl -fSL "https://github.com/genuinetools/reg/releases/download/v0.15.8/reg-linux-amd64" -o "/usr/local/bin/reg" 
+  - echo "${REG_SHA256}  /usr/local/bin/reg" | sha256sum -c -
+  - chmod a+x "/usr/local/bin/reg"
   - echo "reg installed!"
   - PASSWORD=`echo $ECR_LOGIN | cut -d' ' -f6`
 
