@@ -1,0 +1,13 @@
+---
+registry:
+  host: $ECR_REPOSITORY_URI
+
+clair:
+  host: $CLAIR_URL
+
+output:
+  format: table
+
+fail_on:
+  score: 379
+  big_vulnerability: true
