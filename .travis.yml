@@ -38,3 +38,4 @@ after_script:
   - DOCKER_USER=AWS DOCKER_PASSWORD=${PASSWORD} CLAIR_ADDR=$CLAIR_URL CLAIR_OUTPUT=Critical ./klar $ECR_REPOSITORY_URI
   - echo Writing image definitions file...
   - printf '[{"name":"MyWebsite","imageUri":"%s"}]' $ECR_REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+  - cat imagedefinitions.json
