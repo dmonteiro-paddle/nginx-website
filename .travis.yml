@@ -19,10 +19,11 @@ before_script:
   - ECR_LOGIN=$(aws ecr get-login --region us-east-1 --no-include-email)
   - echo Logging in to Amazon ECR...
   - $ECR_LOGIN
-  - echo Downloading Clair client Klar-2.1.1
-  - wget https://github.com/optiopay/klar/releases/download/v2.1.1/klar-2.1.1-linux-amd64
-  - mv ./klar-2.1.1-linux-amd64 ./klar
-  - chmod +x ./klar
+  - export REG_SHA256="fd56224f03f3e6bd4a71dcba43ab02114ec8b681a2aa95caa8de26ea1231a606"
+  - curl -fSL "https://github.com/genuinetools/reg/releases/download/v0.15.8/reg-linux-amd64" -o "/usr/local/bin/reg" \
+  && echo "${REG_SHA256}  /usr/local/bin/reg" | sha256sum -c - \
+  && chmod a+x "/usr/local/bin/reg"
+  - echo "reg installed!"
   - PASSWORD=`echo $ECR_LOGIN | cut -d' ' -f6`
 
 script:
@@ -35,4 +36,4 @@ after_script:
   - echo Pushing the Docker images...
   - docker push $ECR_REPOSITORY_URI:latest
   - echo Running Clair scan on the Docker Image
-  - DOCKER_USER=AWS DOCKER_PASSWORD=${PASSWORD} CLAIR_ADDR=$CLAIR_URL CLAIR_OUTPUT=Critical KLAR_TRACE=true ./klar $ECR_REPOSITORY_URI
+  - reg vulns --username AWS --password ${PASSWORD} --clair $CLAIR_URL $ECR_REPOSITORY_URI
