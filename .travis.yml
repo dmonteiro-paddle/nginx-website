@@ -19,9 +19,6 @@ before_script:
   - ECR_LOGIN=$(aws ecr get-login --region us-east-1 --no-include-email)
   - echo Logging in to Amazon ECR...
   - $ECR_LOGIN
-  - curl https://github.com/genuinetools/reg/releases/download/v0.15.8/reg-linux-amd64 -o reg
-  - chmod a+x reg
-  - echo "reg installed!"
   - PASSWORD=`echo $ECR_LOGIN | cut -d' ' -f6`
 
 script:
@@ -33,4 +30,4 @@ after_script:
   - echo Pushing the Docker images...
   - docker push $ECR_REPOSITORY_URI:latest
   - echo Running Clair scan on the Docker Image
-  - ./reg vulns --username AWS --password ${PASSWORD} --clair $CLAIR_URL $ECR_REPOSITORY_URI
+  - docker run -v `pwd`:/opt/yair/config/:ro yfoelling/yair $ECR_REPOSITORY_URI
