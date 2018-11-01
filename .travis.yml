@@ -6,12 +6,19 @@ branches:
     - master
     - devel
 
+env:
+  global:
+    - secure: "dQcU49+wNPMf42RXSQzo1xq8Fg9j6FyONfPT9++AGGaf1rXQTpaOBzUNxVV74BbG1HM6chX09egNT9kHV/wfi6qEwzudDMJ4loCAMjT8qJb0BIXPmR2J7mPL//BbslzL9Aa0+BTWbSQ/PjjRl3RkzMyjWpILp2Q8r54lghpMYefEAn0255Zydivy9PgJQXi7/gP5blzuLAI0tSGVXLpCIkE4dj9afQFB15zYWzdm56+/XhfA2UYv7hvIeo3mJaJ/+02l6tkHGgTqppbj41QU9PXcdSjq7d+Ju1fiGddv9EXRYXz6bGgXO3r4mx9ekGH9LmigjKF+BsvYtHQLZZTq+puC2acxPLw5+R3d1lfhmOvfubK4oOfXgVL62j/hciXy4y8YwWoSXXD514uHv3LbyL9t1EVNUBdEw3nRjGGttK3kJcYPuXBAoAB3M+o8VCHDwpM5oqW188R8z3HG+cyMG987Txec2pXfDGnSiMY2vi+Fr1WQ8NkV/GfVnR3RrEcFVf4FBA5iWyhDQXc+DbpUK+FxuKzssbdWMIelDdbuyVlaRlZAHMRXErcwOyCvGW+Oge5yq9FsKENhrrmuLTXnM5+M4NAwNRQp+AldjojxAt1kL/HRpwrGwYpa/tG/JQLqZ12uSK1mDg6FCmltZRGOL2AVfnBJT5kjnXjfEi7Y5FM="
+    - secure: "ENi/Nu4zy702hOP4TccENAgyf3IlHTWLJOCV9Z+5bCaGWaDkxQxVho0b/AJe6OtO2D+ViaafEPBkbTCSwx8YXooj3rekTj47nQ2/ZmKojhQdBtKxDJgPfuPh8dFMHXNQfqMg6KCqQnb8VUlfdbhqxZe+50moPqPTZayv8FdaR48fK7roTXLxFeY++ExsgWP/cO4HAoVdH22d/uJDKio5Gm7Tyw08BoYCqZS2TAKbBKsCYhM+PWonzCu6W9trLvP6ikFtK+ewW7Bus3cqh2+MPtbldvuEaXWht7nPc0xT4OzA69g+YtDlX5aX7tFsAtqXel2XPioKBdgdi+wkdllZkU8pmk8VOm3+qW7Rq/821+vn3gHVT8ndERxPvuQIT9PC8NNqL3WVmnBYfigguR9kofviJt+YI0RJssKATIOPwOQQBuHc6lXCBs9GUJRtIRmm7uODdQUbv5x9+gejiNLxR5H/0A4gxt3Zl0PCD8tSrj75xzdKuIb8Ljn23Dhs9YosPm5TkZBjNtj9zAFQzKi4n5ua1rv5SPgNaDGmDHkkRW4F3aVnMF1zxiXDX7Cz+1AJ09R2zL+BAqdgwULg7EETkQKUR/2e5NFEqNFmGcWbp2JF06XItVUcVHK3Fmal/KVK5KAq1LWpDeSH6m+Hn7AsIY+5L55piwwkDwZgQto2RL4="
+
+
 before_script:
+  - pip install --user awscli # install aws cli w/o sudo
+  - export PATH=$PATH:$HOME/.local/bin # put aws in the path
   - echo Fetching ECR Login
-  - ECR_LOGIN=$(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
+  - ECR_LOGIN=$(aws ecr get-login --region us-east-1 --no-include-email)
   - echo Logging in to Amazon ECR...
   - $ECR_LOGIN
-  - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
   - echo Downloading Clair client Klar-2.1.1
   - wget https://github.com/optiopay/klar/releases/download/v2.1.1/klar-2.1.1-linux-amd64
   - mv ./klar-2.1.1-linux-amd64 ./klar
@@ -22,14 +29,11 @@ script:
   - echo Build started on `date`
   - echo Building the Docker image...
   - docker build -t $ECR_REPOSITORY_URI:latest .
-  - docker tag $ECR_REPOSITORY_URI:latest $ECR_REPOSITORY_URI:$IMAGE_TAG
 
 after_script:
-  - bash -c "if [ /"$CODEBUILD_BUILD_SUCCEEDING/" == /"0/" ]; then exit 1; fi"
   - echo Build completed on `date`
   - echo Pushing the Docker images...
   - docker push $ECR_REPOSITORY_URI:latest
-  - docker push $ECR_REPOSITORY_URI:$IMAGE_TAG
   - echo Running Clair scan on the Docker Image
   - DOCKER_USER=AWS DOCKER_PASSWORD=${PASSWORD} CLAIR_ADDR=$CLAIR_URL CLAIR_OUTPUT=Critical ./klar $ECR_REPOSITORY_URI
   - echo Writing image definitions file...
