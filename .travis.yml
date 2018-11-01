@@ -35,7 +35,4 @@ after_script:
   - echo Pushing the Docker images...
   - docker push $ECR_REPOSITORY_URI:latest
   - echo Running Clair scan on the Docker Image
-  - DOCKER_USER=AWS DOCKER_PASSWORD=${PASSWORD} CLAIR_ADDR=$CLAIR_URL CLAIR_OUTPUT=Critical JSON_OUTPUT=true ./klar $ECR_REPOSITORY_URI
-  - echo Writing image definitions file...
-  - printf '[{"name":"MyWebsite","imageUri":"%s"}]' $ECR_REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
-  - cat imagedefinitions.json
+  - DOCKER_USER=AWS DOCKER_PASSWORD=${PASSWORD} CLAIR_ADDR=$CLAIR_URL CLAIR_OUTPUT=Critical KLAR_TRACE=true ./klar $ECR_REPOSITORY_URI
