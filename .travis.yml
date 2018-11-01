@@ -33,4 +33,4 @@ after_script:
   - echo Pushing the Docker images...
   - docker push $ECR_REPOSITORY_URI:latest
   - echo Running Clair scan on the Docker Image
-  - reg vulns --username AWS --password ${PASSWORD} --clair $CLAIR_URL $ECR_REPOSITORY_URI
+  - ./reg vulns --username AWS --password ${PASSWORD} --clair $CLAIR_URL $ECR_REPOSITORY_URI
