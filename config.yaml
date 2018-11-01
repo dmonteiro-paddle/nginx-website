@@ -1,9 +1,11 @@
 ---
 registry:
-  host: $ECR_REPOSITORY_URI
+  host: ${ECR_REPOSITORY_URI}
+  username: AWS
+  password: ${PASSWORD}
 
 clair:
-  host: $CLAIR_URL
+  host: ${CLAIR_URL}
 
 output:
   format: table
